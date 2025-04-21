@@ -328,15 +328,39 @@ public class QkartSanity {
         Login login = new Login(driver);
 
         // TODO: CRIO_TASK_MODULE_TEST_AUTOMATION - TEST CASE 06: MILESTONE 5
+        // Go to the Register page
+        registration.navigateToRegisterPage();
 
-        // TODO: Register a new user
+        // Register a new user
+        status = registration.registerUser("testUser", "abc@123", true);
+        if (!status) {
+            logStatus("TestCase 6", "Test Case Failure. Verify that cart can be edited", "FAIL");
+        }
 
-        // TODO: Login using the newly registed user
+        // Save the username of the newly registered user
+        lastGeneratedUserName = registration.lastGeneratedUsername;
 
-        // TODO: Add "Xtend Smart Watch" to cart
+        // Go to the login page
+        login.navigateToLoginPage();
 
-        // TODO: Add "Yarine Floor Lamp" to cart
+        // Login with the newly registered user's credentials
+        status = login.PerformLogin(lastGeneratedUserName, "abc@123");
+        if (!status) {
+            logStatus("Step Failure", "User Perform Login Failed", status ? "PASS" : "FAIL");
+            logStatus("End TestCase", "Test Case 6: Verify that cart can be edited : ", status ? "PASS" : "FAIL");
+        }
 
+        // Go to the home page
+        Home homePage = new Home(driver);
+        homePage.navigateToHome();
+
+        // Find required products by searching and add them to the user's cart
+        status = homePage.searchForProduct("Xtend Smart Watch");
+        homePage.addProductToCart("Xtend Smart Watch");
+        status = homePage.searchForProduct("Yarine Floor Lamp");
+        homePage.addProductToCart("Yarine Floor Lamp");
+        Thread.sleep(3000);
+        
         // update watch quantity to 2
         homePage.changeProductQuantityinCart("Xtend Smart Watch", 2);
 
@@ -426,6 +450,10 @@ public class QkartSanity {
         int totalTests = 0;
         int passedTests = 0;
         Boolean status;
+
+        //Initialize the driver
+        RemoteWebDriver driver = createDriver();
+        
         // Maximize and Implicit Wait for things to initailize
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
